@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<doc xmlns:clj="http://clojure.org">
+
+  <introduction>
+    <p>This is the introduction.</p>
+  </introduction>
+
+  <p>
+    Here's what happens when we evaluate code: <clj:code>(+ 21 2)</clj:code>.
+  </p>
+
+  <p>
+    We do this by putting the code in an XML element - for this
+    example, we use &lt;clj:code>...&lt;/clj:code>.  A template in the XSLT
+    stylesheet grabs the element and calls our extension function with
+    the code as argument; the extension function then uses
+    clojure.java.api.Clojure to send it to the Clojure runtime for
+    evaluation.  The result is returned to the stylesheet, which
+    typesets it.  Something like:
+  </p>
+
+
+  <pre>
+<![CDATA[
+  <xsl:template match="clj:code"
+		xmlns:mi="http://mobileink.org/xsl/saxon" <!-- namespace for extension function -->
+		xmlns:clj="http://clojure.org">		  <!-- namespace for clojure code tags -->
+    <span class="code">
+      <xsl:apply-templates/>
+      <xsl:text> ;; -> </xsl:text>
+      <xsl:variable name="code">
+	<xsl:apply-templates/>
+      </xsl:variable>
+      <xsl:choose>
+	<xsl:when test="@eval='no'"/>
+	<xsl:otherwise>
+	  <xsl:value-of select="mi:clj($code)"/> <!-- mi:clj() is our extenstion function -->
+	</xsl:otherwise>
+      </xsl:choose>
+    </span>
+  </xsl:template>
+]]>
+  </pre>
+  
+  <p>
+    The essential component is just the extension function; the form
+    of the XML source document, and the stylesheet logic that manages
+    it, are completely under the control of the user.  In this
+    example, we've told our stylesheet to first typeset the code, then
+    send it for evaluation, and finally typeset the result.  But
+    that's only one way to do it.  For example, you could also define
+    an attrib like "eval='yes'" to control whether the stylesheet
+    evaluates the code or only typesets it.
+  </p>
+
+  <p>
+    One way this functionality might be used is to implement a
+    "literate testing" tool similar to <xref
+    href="http://concordion.org/">Concordion</xref>
+  </p>
+
+  <p>
+    Since we can eval Clojure code, we can eval Clojure.test code.
+    The extension function loads both <codeph>clojure.core</codeph>
+    and <codeph>clojure.test</codeph> by default.  So all we have to
+    do is send some code for evaluation: <clj:code>(clojure.test/is (= 4 (+ 2
+    2)))</clj:code>.  <codeph>clojure.test</codeph> is included in the
+    Clojure jar, so we don't need to add anything to the classpath,
+    but it is a distinct namespace, so we have to
+    <codeph>require</codeph> or <codeph>use</codeph> it; the extension
+    does this by default.
+  </p>
+
+  <p>
+    If you need to load a namespace, just send the code: <clj:code>(require
+    'clojure.string)</clj:code>.  Then you can use it:
+    <clj:code>(clojure.string/capitalize "foo")</clj:code>.
+  </p>
+
+  <p>
+    If you really wanted to you could probably write whole programs in
+    this way, but I haven't figured out how to make <clj:code
+    eval="no">(ns foo)</clj:code>
+    work.  Currently it produces: "java.lang.IllegalStateException: Can't change/establish root binding of: *ns* with set"
+    <!-- <clj:code>(ns foo)</clj:code> -->
+  </p>
+
+<!-- <clj:code>(binding [ns org.mobileink.xsl.clj-ext])</clj:code> -->
+
+  <p>
+    But you can define things and then use them.
+  </p>
+
+  <p>Define:
+    <clj:code>(defn foo
+  "I don't do a whole lot."
+  [name]
+  (println (format "I don't do a lot, %s!" name)))
+</clj:code>
+  </p>
+
+  <p>
+    Use:
+    <clj:code>(foo "Frank")</clj:code>
+  </p>
+
+  <p>
+    Note: the side effects (println) will show up in the console from
+    which you ran XSLT.  TODO: capture stdout and stderr and return to
+    stylesheet along with result.
+  </p>
+
+  <p>
+    And if you wanted to make something truly hideous, you could use
+    an XML tag for each element of the language, so you could write
+    something like:
+  </p>
+
+  <pre>
+<![CDATA[
+    <defn>
+      <nm>foo</nm>
+      <docstring>I don't do a whole lot.</docstring>
+      <parm-vec><parm>x</parm></parm-vec>
+      <body>
+        <apply>
+	  <fn>println</fn><arg-vec><arg>x</arg><arg>"Hello, World!"</arg></arg-vec>
+	</apply>
+      </body>
+    </defn>
+]]>
+  </pre>
+
+  <p>and have the stylesheet turn it into Clojure code and evaluate
+  it.  But remember: just because you <i>can</i> do something, doesn't mean you <i>should</i>.</p>
+
+</doc>
+
