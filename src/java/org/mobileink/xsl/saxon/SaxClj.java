@@ -1,5 +1,6 @@
 package org.mobileink.xsl.saxon;
 
+import java.io.*;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import javax.xml.transform.TransformerException;
@@ -34,6 +35,11 @@ import net.sf.saxon.s9api.*;
 public class SaxClj extends ExtensionFunctionDefinition {
     private static final IFn EVAL = Clojure.var("clojure.core", "eval");
     private static final IFn REQUIRE = Clojure.var("clojure.core", "require");
+    private static final ByteArrayOutputStream newOut = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
+    private static final PrintStream oldOut = System.out;
+    private static final PrintStream oldErr = System.err;
+    // System.setOut(new PrintStream(baos));
     static {
  	REQUIRE.invoke(Clojure.read("clojure.test"));
  	REQUIRE.invoke(Clojure.read("clojure.tools.reader"));
@@ -55,21 +61,33 @@ public class SaxClj extends ExtensionFunctionDefinition {
     @Override public ExtensionFunctionCall makeCallExpression() { return new ExtensionFunctionCall()
 	{
 	    public Sequence call(XPathContext context, Sequence[] arguments) throws XPathException {
+
 		String input = arguments[0].head().getStringValue();
 		System.out.println("input: " + input);
 
 		Object expanded = READSTR.invoke(input);
 		System.out.println("expanded: " + expanded.toString());
 
+		System.setOut(new PrintStream(newOut));
+		System.setErr(new PrintStream(newErr));
 		Object o = EVAL.invoke(Clojure.read(expanded.toString()));
+		System.out.flush();
+		System.err.flush();
+		System.setOut(oldOut);
+		System.setErr(oldErr);
 
+		String s;
 		if (o != null) {
-		    System.out.println("output: " + o.toString());
-		    return StringValue.makeStringValue(o.toString());
+		    s = o.toString();
 		} else {
-		    System.out.println("output: " + o);
-		    return StringValue.makeStringValue("ok");
+		    s= "ok";
 		}
+		s = s + "\n[[stdout:\n" + newOut.toString() + "]]\n[[stderr:\n" + newErr.toString() + "]]";
+		newOut.reset();
+		newErr.reset();
+
+		System.out.println("result: " + s.toString());
+		return StringValue.makeStringValue(s);
 	    }
 	};
     }
