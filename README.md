@@ -54,6 +54,15 @@ One possible use for this is to create unit testing along the lines of
 [Concordion](http://concordion.org/).  What's needed is an XML schema
 and stylesheet.  XSL parameters could be used to select tests to run.
 
+
+## Contributing
+
+See the documentation on XSL extensions on the Saxon and Xalan websites.
+
+## Resources
+
+[Jproc](https://code.google.com/p/jproc/) "JProc provides a convenient way for java code to interface with external programs"
+
 ## Roadmap
 
 ### Required
@@ -64,10 +73,6 @@ and stylesheet.  XSL parameters could be used to select tests to run.
 * Implement extension tag as well as function
 * Robust error-checking
 * Deploy to clojars
-
-## Contributing
-
-See the documentation on XSL extensions on the Saxon and Xalan websites.
 
 ### Nice-to-have
 
