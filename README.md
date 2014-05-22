@@ -67,4 +67,7 @@ and stylesheet.  XSL parameters could be used to select tests to run.
 ### Nice-to-have
 
 * XML scheme for unit testing
+* Stylesheets
+  * Unit testing
+  * API documentation by cases
 
