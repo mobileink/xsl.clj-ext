@@ -64,6 +64,10 @@ and stylesheet.  XSL parameters could be used to select tests to run.
 * Robust error-checking
 * Deploy to clojars
 
+## Contributing
+
+See the documentation on XSL extensions on the Saxon and Xalan websites.
+
 ### Nice-to-have
 
 * XML scheme for unit testing
