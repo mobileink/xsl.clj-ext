@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:mi="http://mobileink.org/saxon"
-		xmlns:clj="http://clojure.org"
-                exclude-result-prefixes="mi"
+		xmlns:clj="http://mobileink.org/schema/xml/clj"
+		xmlns:cljsax="http://mobileink.org/xsl/clj/saxon"
                 version='2.0'>
+		<!-- xmlns:clj="http://clojure.org" -->
 
   <xsl:output method="html"
               encoding="utf-8"
@@ -40,7 +40,19 @@
       <head>
 	<style type="text/css">
 	  section {margin:1em;}
-	  span.code {padding-bottom:8px;border:thin solid black;}
+	  span.code {border:thin solid black;
+	  padding-top:2px;
+	  padding-bottom:9px;
+	  padding-left:4px;
+	  padding-right:4px;
+	  margin-top:4px;
+	  margin-bottom:4px;
+	  margin-left:4pt;
+	  margin-right:2pt;
+	  background-color:#CCFFFF!important;}
+	  span.form {padding-top:2px;padding-bottom:8px;background-color:#66FFFF;}
+	  span.result {padding-top:2px;padding-bottom:8px;background-color:#99FFCC;}
+	  tt {background-color:#F0F0F0;}
 	  pre {background-color:gray;}
 	  div {margin-top:8px;margin-bottom:8px;}
 	</style>
@@ -87,9 +99,17 @@
     </i>
   </xsl:template>
 
+  <xsl:template match="p">
+    <div>
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+
   <xsl:template match="clj:code">
     <span class="code">
-      <xsl:apply-templates/>
+      <span class="form">
+	<xsl:apply-templates/>
+      </span>
       <xsl:text> ;; -> </xsl:text>
       <xsl:variable name="code">
 	<xsl:apply-templates/>
@@ -97,12 +117,14 @@
       <!-- <xsl:variable name="i"> -->
       <!-- 	<xsl:value-of select="concat('(* 3 ', $n, ')')"/> -->
       <!-- </xsl:variable> -->
-      <xsl:choose>
-	<xsl:when test="@eval='no'"/>
-	<xsl:otherwise>
-	  <xsl:value-of select="mi:clj($code)"/>
-	</xsl:otherwise>
-      </xsl:choose>
+      <span class="result">
+	<xsl:choose>
+	  <xsl:when test="@eval='no'"/>
+	  <xsl:otherwise>
+	    <xsl:value-of select="cljsax:eval($code)"/>
+	  </xsl:otherwise>
+	</xsl:choose>
+      </span>
     </span>
   </xsl:template>
 
@@ -114,19 +136,13 @@
       <xsl:text>(doseq [x [1 2 3]] prn x)</xsl:text>
     </xsl:variable>
     <pre>
-      <xsl:value-of select="mi:clj('(doseq [x [11 22 33]] (prn x))')"/>
-      <xsl:variable name="res" select="mi:clj('(let [[x y] [0 1]] (list x y))')"/>
+      <xsl:value-of select="cljsax:eval('(doseq [x [11 22 33]] (prn x))')"/>
+      <xsl:variable name="res" select="cljsax:eval('(let [[x y] [0 1]] (list x y))')"/>
       <xsl:text>
 (let [[x y] [0 1]] (list x y))
   ;; -></xsl:text>
  <xsl:value-of select="$res"/>
     </pre>
-  </xsl:template>
-
-  <xsl:template match="p">
-    <div>
-      <xsl:apply-templates/>
-    </div>
   </xsl:template>
 
   <xsl:template match="xref">
@@ -139,9 +155,9 @@
   </xsl:template>
 
   <xsl:template match="codeph">
-    <span class="codeph">
+    <tt class="codeph">
       <xsl:apply-templates/>
-    </span>
+    </tt>
   </xsl:template>
 
 </xsl:stylesheet>

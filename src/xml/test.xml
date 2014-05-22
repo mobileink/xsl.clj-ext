@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<doc xmlns:clj="http://clojure.org">
+<doc xmlns:clj="http://mobileink.org/schema/xml/clj">
 
   <introduction>
     <p>This is the introduction.</p>
@@ -23,7 +23,7 @@
 
   <pre>
 <![CDATA[
-  <xsl:template match="clj:code"
+  <xsl:template match="code"
 		xmlns:mi="http://mobileink.org/xsl/saxon" <!-- namespace for extension function -->
 		xmlns:clj="http://clojure.org">		  <!-- namespace for clojure code tags -->
     <span class="code">
@@ -35,14 +35,14 @@
       <xsl:choose>
 	<xsl:when test="@eval='no'"/>
 	<xsl:otherwise>
-	  <xsl:value-of select="mi:clj($code)"/> <!-- mi:clj() is our extenstion function -->
+	  <xsl:value-of select="x:eval($code)"/> <!-- x:eval(...) is our extenstion function -->
 	</xsl:otherwise>
       </xsl:choose>
     </span>
   </xsl:template>
 ]]>
   </pre>
-  
+
   <p>
     The essential component is just the extension function; the form
     of the XML source document, and the stylesheet logic that manages
@@ -96,7 +96,7 @@
     <clj:code>(defn foo
   "I don't do a whole lot."
   [name]
-  (println (format "I don't do a lot, %s!" name)))
+  (format "I don't do a lot, %s!" name))
 </clj:code>
   </p>
 
@@ -136,4 +136,3 @@
   it.  But remember: just because you <i>can</i> do something, doesn't mean you <i>should</i>.</p>
 
 </doc>
-
