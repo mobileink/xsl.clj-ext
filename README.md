@@ -62,6 +62,7 @@ and stylesheet.  XSL parameters could be used to select tests to run.
 * Xalan support
 * Implement extension tag as well as function
 * Robust error-checking
+* Deploy to clojars
 
 ### Nice-to-have
 
