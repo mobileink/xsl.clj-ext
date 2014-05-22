@@ -59,6 +59,7 @@ and stylesheet.  XSL parameters could be used to select tests to run.
 ### Required
 
 * Testing - currently only a few types of Clojure expressions have been run through it.
+* Replace saxon.sh and xalan.sh by a leiningen plugin
 * Xalan support
 * Implement extension tag as well as function
 * Robust error-checking
