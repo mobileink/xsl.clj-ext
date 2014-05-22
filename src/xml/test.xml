@@ -23,9 +23,9 @@
 
   <pre>
 <![CDATA[
-  <xsl:template match="code"
-		xmlns:mi="http://mobileink.org/xsl/saxon" <!-- namespace for extension function -->
-		xmlns:clj="http://clojure.org">		  <!-- namespace for clojure code tags -->
+  <xsl:template match="clj:code"
+		xmlns:clj="http://mobileink.org/schema/xml/clj"   <!-- namespace for the code tag -->
+		xmlns:cljsax="http://mobileink.org/xsl/clj/saxon" <!-- namespace for the extension fn -->
     <span class="code">
       <xsl:apply-templates/>
       <xsl:text> ;; -> </xsl:text>
@@ -35,7 +35,7 @@
       <xsl:choose>
 	<xsl:when test="@eval='no'"/>
 	<xsl:otherwise>
-	  <xsl:value-of select="x:eval($code)"/> <!-- x:eval(...) is our extenstion function -->
+	  <xsl:value-of select="cljsax:eval($code)"/> <!-- cljsax:eval(...) is our extenstion function -->
 	</xsl:otherwise>
       </xsl:choose>
     </span>
