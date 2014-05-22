@@ -35,10 +35,10 @@ import net.sf.saxon.s9api.*;
 public class SaxClj extends ExtensionFunctionDefinition {
     private static final IFn EVAL = Clojure.var("clojure.core", "eval");
     private static final IFn REQUIRE = Clojure.var("clojure.core", "require");
-    private static final ByteArrayOutputStream newOut = new ByteArrayOutputStream();
-    private static final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
-    private static final PrintStream oldOut = System.out;
-    private static final PrintStream oldErr = System.err;
+    // private static final ByteArrayOutputStream newOut = new ByteArrayOutputStream();
+    // private static final ByteArrayOutputStream newErr = new ByteArrayOutputStream();
+    // private static final PrintStream oldOut = System.out;
+    // private static final PrintStream oldErr = System.err;
     // System.setOut(new PrintStream(baos));
     static {
  	REQUIRE.invoke(Clojure.read("clojure.test"));
@@ -48,7 +48,7 @@ public class SaxClj extends ExtensionFunctionDefinition {
     private static final IFn READSTR = Clojure.var("clojure.tools.reader", "read-string");
 
     @Override public StructuredQName getFunctionQName() {
-	return new StructuredQName("mi", "http://mobileink.org/saxon", "clj");
+	return new StructuredQName("cljsax", "http://mobileink.org/xsl/clj/saxon", "eval");
     }
 
     @Override public SequenceType[] getArgumentTypes() {
@@ -68,13 +68,15 @@ public class SaxClj extends ExtensionFunctionDefinition {
 		Object expanded = READSTR.invoke(input);
 		System.out.println("expanded: " + expanded.toString());
 
-		System.setOut(new PrintStream(newOut));
-		System.setErr(new PrintStream(newErr));
+		// NB: goal is to capture stdout/stderr and return it to the client.  Haven't figured it out yet.
+
+		// System.setOut(new PrintStream(newOut));
+		// System.setErr(new PrintStream(newErr));
 		Object o = EVAL.invoke(Clojure.read(expanded.toString()));
-		System.out.flush();
-		System.err.flush();
-		System.setOut(oldOut);
-		System.setErr(oldErr);
+		// System.out.flush();
+		// System.err.flush();
+		// System.setOut(oldOut);
+		// System.setErr(oldErr);
 
 		String s;
 		if (o != null) {
@@ -82,9 +84,9 @@ public class SaxClj extends ExtensionFunctionDefinition {
 		} else {
 		    s= "ok";
 		}
-		s = s + "\n[[stdout:\n" + newOut.toString() + "]]\n[[stderr:\n" + newErr.toString() + "]]";
-		newOut.reset();
-		newErr.reset();
+		// s = s + "\n[[stdout:\n" + newOut.toString() + "]]\n[[stderr:\n" + newErr.toString() + "]]";
+		// newOut.reset();
+		// newErr.reset();
 
 		System.out.println("result: " + s.toString());
 		return StringValue.makeStringValue(s);
